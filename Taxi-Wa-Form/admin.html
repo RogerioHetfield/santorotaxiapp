@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Central de Despacho – Táxi Rápido</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --yellow: #FFC107;
+        --yellow-dark: #e5a800;
+        --yellow-glow: rgba(255,193,7,0.35);
+        --yellow-dim: rgba(255,193,7,0.12);
+        --green: #4ade80;
+        --green-bg: rgba(74,222,128,0.12);
+        --blue: #60a5fa;
+        --blue-bg: rgba(96,165,250,0.12);
+        --orange: #fb923c;
+        --orange-bg: rgba(251,146,60,0.12);
+        --red: #f87171;
+        --red-bg: rgba(248,113,113,0.12);
+        --purple: #c084fc;
+        --purple-bg: rgba(192,132,252,0.12);
+        --white: #ffffff;
+        --bg: #07090f;
+        --bg-2: #0d111c;
+        --bg-card: rgba(255,255,255,0.045);
+        --bg-card-h: rgba(255,255,255,0.075);
+        --border: rgba(255,255,255,0.07);
+        --border-y: rgba(255,193,7,0.18);
+        --text-1: rgba(255,255,255,0.92);
+        --text-2: rgba(255,255,255,0.62);
+        --text-3: rgba(255,255,255,0.38);
+        --radius: 16px;
+        --radius-sm: 10px;
+        --shadow: 0 4px 24px rgba(0,0,0,0.3);
+        --shadow-md: 0 8px 40px rgba(0,0,0,0.4);
+        --shadow-lg: 0 16px 60px rgba(0,0,0,0.55);
+      }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: var(--bg);
+        color: var(--text-1);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Subtle taxi bg + glow */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1920&q=80');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.04;
+        z-index: -2;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255,193,7,0.06) 0%, transparent 70%),
+          linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+        z-index: -1;
+      }
+
+      /* ══════════════════════════════════
+         LOGIN SCREEN
+      ══════════════════════════════════ */
+      #tela-login {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 900;
+        background:
+          radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255,193,7,0.08) 0%, transparent 65%),
+          linear-gradient(160deg, #060a14 0%, #0d1220 100%);
+        padding: 20px;
+      }
+
+      #tela-login::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1920&q=80');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.06;
+      }
+
+      #tela-login.hide { display: none; }
+
+      .login-box {
+        position: relative;
+        background: rgba(255,255,255,0.04);
+        backdrop-filter: blur(32px);
+        -webkit-backdrop-filter: blur(32px);
+        border: 1px solid rgba(255,193,7,0.2);
+        border-radius: 26px;
+        padding: 42px 36px 40px;
+        width: 100%;
+        max-width: 360px;
+        text-align: center;
+        box-shadow: 0 0 0 1px rgba(255,193,7,0.06), 0 24px 80px rgba(0,0,0,0.7);
+        animation: loginIn 0.5s cubic-bezier(0.34,1.3,0.64,1) both;
+      }
+
+      @keyframes loginIn {
+        from { opacity: 0; transform: scale(0.92) translateY(20px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+      }
+
+      .login-icon {
+        font-size: 3.5rem;
+        line-height: 1;
+        margin-bottom: 16px;
+        filter: drop-shadow(0 4px 20px rgba(255,193,7,0.4));
+      }
+
+      .login-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--yellow);
+        letter-spacing: -0.3px;
+        text-shadow: 0 2px 20px rgba(255,193,7,0.3);
+        margin-bottom: 4px;
+      }
+
+      .login-sub {
+        font-size: 0.82rem;
+        color: var(--text-3);
+        font-weight: 500;
+        margin-bottom: 28px;
+      }
+
+      /* PIN dots */
+      .pin-dots {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-bottom: 26px;
+      }
+
+      .pin-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid rgba(255,193,7,0.35);
+        background: transparent;
+        transition: all 0.18s cubic-bezier(0.34,1.5,0.64,1);
+      }
+
+      .pin-dot.filled {
+        background: var(--yellow);
+        border-color: var(--yellow);
+        box-shadow: 0 0 16px rgba(255,193,7,0.6);
+        transform: scale(1.15);
+      }
+
+      .pin-dot.error {
+        background: var(--red);
+        border-color: var(--red);
+        box-shadow: 0 0 14px rgba(248,113,113,0.5);
+        animation: shake 0.35s ease;
+      }
+
+      @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        25%      { transform: translateX(-5px); }
+        75%      { transform: translateX(5px); }
+      }
+
+      /* PIN keypad */
+      .pin-keypad {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        max-width: 220px;
+        margin: 0 auto 18px;
+      }
+
+      .pin-key {
+        aspect-ratio: 1;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        color: var(--text-1);
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.12s;
+        -webkit-tap-highlight-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .pin-key:hover { background: rgba(255,193,7,0.12); border-color: rgba(255,193,7,0.25); }
+      .pin-key:active { transform: scale(0.92); background: rgba(255,193,7,0.2); }
+
+      .pin-key.del {
+        background: rgba(248,113,113,0.08);
+        border-color: rgba(248,113,113,0.15);
+        color: var(--red);
+        font-size: 1rem;
+      }
+
+      .pin-key.zero { grid-column: 2; }
+
+      .login-hint {
+        font-size: 0.68rem;
+        color: var(--text-3);
+        margin-top: 6px;
+      }
+
+      /* ══════════════════════════════════
+         HEADER
+      ══════════════════════════════════ */
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        height: 64px;
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-y);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 30px rgba(0,0,0,0.4);
+      }
+
+      .header-brand { display: flex; align-items: center; gap: 12px; }
+
+      .brand-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #FFC107, #ff8f00);
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        box-shadow: 0 3px 16px rgba(255,193,7,0.5);
+      }
+
+      .brand-name {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--yellow);
+        letter-spacing: -0.2px;
+        text-shadow: 0 1px 14px rgba(255,193,7,0.3);
+      }
+
+      .brand-sub {
+        font-size: 0.65rem;
+        color: var(--text-3);
+        font-weight: 500;
+      }
+
+      .header-actions { display: flex; align-items: center; gap: 8px; }
+
+      .btn-header {
+        padding: 8px 16px;
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        border: 1px solid;
+        white-space: nowrap;
+      }
+
+      .btn-cliente {
+        background: var(--yellow-dim);
+        border-color: var(--border-y);
+        color: var(--yellow);
+      }
+      .btn-cliente:hover { background: rgba(255,193,7,0.2); }
+
+      .btn-sair {
+        background: rgba(248,113,113,0.08);
+        border-color: rgba(248,113,113,0.15);
+        color: var(--red);
+      }
+      .btn-sair:hover { background: rgba(248,113,113,0.16); }
+
+      /* ══════════════════════════════════
+         LAYOUT
+      ══════════════════════════════════ */
+      .layout {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 20px 40px;
+      }
+
+      /* Stats grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+        overflow: hidden;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0.06;
+        border-radius: inherit;
+      }
+
+      .stat-card.total { border-color: rgba(255,193,7,0.2); }
+      .stat-card.total::before { background: linear-gradient(135deg, var(--yellow), #ff8f00); }
+      .stat-card.wait  { border-color: rgba(251,146,60,0.2); }
+      .stat-card.wait::before  { background: linear-gradient(135deg, var(--orange), #ef4444); }
+      .stat-card.sent  { border-color: rgba(96,165,250,0.2); }
+      .stat-card.sent::before  { background: linear-gradient(135deg, var(--blue), var(--purple)); }
+      .stat-card.done  { border-color: rgba(74,222,128,0.2); }
+      .stat-card.done::before  { background: linear-gradient(135deg, var(--green), #22c55e); }
+
+      .stat-icon { font-size: 1.5rem; line-height: 1; margin-bottom: 4px; }
+      .stat-label { font-size: 0.72rem; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; }
+      .stat-value { font-size: 2rem; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+
+      .stat-card.total .stat-value { color: var(--yellow); }
+      .stat-card.wait  .stat-value { color: var(--orange); }
+      .stat-card.sent  .stat-value { color: var(--blue); }
+      .stat-card.done  .stat-value { color: var(--green); }
+
+      /* Main grid */
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 16px;
+      }
+
+      /* ── CARD ── */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px 14px;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+      }
+
+      .card-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-1);
+        letter-spacing: -0.1px;
+      }
+
+      .card-body { padding: 16px 18px; }
+
+      /* Tabs */
+      .tabs { display: flex; gap: 4px; }
+
+      .tab {
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        background: transparent;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text-3);
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+      }
+
+      .tab:hover { color: var(--text-2); background: var(--bg-card-h); }
+
+      .tab.active {
+        background: var(--yellow-dim);
+        border-color: var(--border-y);
+        color: var(--yellow);
+      }
+
+      .tab-count {
+        background: rgba(255,255,255,0.08);
+        border-radius: 20px;
+        padding: 1px 6px;
+        font-size: 0.65rem;
+        font-weight: 700;
+      }
+
+      .tab.active .tab-count {
+        background: rgba(255,193,7,0.2);
+        color: var(--yellow);
+      }
+
+      /* ── CORRIDA CARDS ── */
+      .corrida-card {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        margin-bottom: 10px;
+        overflow: hidden;
+        transition: border-color 0.2s, background 0.2s;
+        border-left: 3px solid transparent;
+      }
+
+      .corrida-card:last-child { margin-bottom: 0; }
+      .corrida-card:hover { background: var(--bg-card-h); }
+
+      .corrida-card.status-aguardando { border-left-color: var(--orange); }
+      .corrida-card.status-despachada  { border-left-color: var(--blue); }
+      .corrida-card.status-concluida   { border-left-color: var(--green); opacity: 0.75; }
+      .corrida-card.status-cancelada   { border-left-color: var(--red); opacity: 0.6; }
+
+      .corrida-top { padding: 12px 14px 6px; }
+
+      .corrida-info { flex: 1; min-width: 0; }
+
+      .corrida-header-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 4px;
+      }
+
+      .corrida-num {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--text-3);
+        background: rgba(255,255,255,0.06);
+        border-radius: 6px;
+        padding: 2px 7px;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+      }
+
+      .corrida-nome {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: var(--text-1);
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .corrida-fone { font-size: 0.72rem; color: var(--text-3); }
+
+      /* Status badges */
+      .status-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 20px;
+        border: 1px solid;
+        flex-shrink: 0;
+        white-space: nowrap;
+        letter-spacing: 0.2px;
+      }
+
+      .badge-aguardando { color: var(--orange); background: var(--orange-bg); border-color: rgba(251,146,60,0.25); }
+      .badge-despachada  { color: var(--blue);   background: var(--blue-bg);   border-color: rgba(96,165,250,0.25); }
+      .badge-concluida   { color: var(--green);  background: var(--green-bg);  border-color: rgba(74,222,128,0.25); }
+      .badge-cancelada   { color: var(--red);    background: var(--red-bg);    border-color: rgba(248,113,113,0.25); }
+
+      /* Corrida route */
+      .corrida-rota {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin: 6px 0 8px;
+      }
+
+      .rota-row { display: flex; align-items: flex-start; gap: 8px; }
+      .rota-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
+      .rota-text { font-size: 0.8rem; color: var(--text-2); line-height: 1.4; }
+
+      .corrida-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+      }
+
+      .meta-item { font-size: 0.7rem; color: var(--text-3); }
+
+      .corrida-motorista {
+        font-size: 0.74rem;
+        color: var(--blue);
+        font-weight: 600;
+        padding: 5px 10px;
+        background: var(--blue-bg);
+        border-radius: 7px;
+        display: none;
+        margin-bottom: 6px;
+      }
+      .corrida-motorista.show { display: block; }
+
+      .corrida-obs {
+        font-size: 0.74rem;
+        color: var(--text-2);
+        padding: 5px 10px;
+        background: rgba(255,255,255,0.04);
+        border-radius: 7px;
+        border-left: 2px solid rgba(255,255,255,0.1);
+        display: none;
+        margin-bottom: 6px;
+      }
+      .corrida-obs.show { display: block; }
+
+      /* Action buttons */
+      .corrida-actions {
+        padding: 8px 14px 12px;
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+      }
+
+      .btn-action {
+        padding: 7px 14px;
+        border-radius: 8px;
+        border: 1px solid;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.73rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.12s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .btn-despachar { background: var(--blue-bg); color: var(--blue); border-color: rgba(96,165,250,0.25); }
+      .btn-despachar:hover { background: rgba(96,165,250,0.2); }
+
+      .btn-concluir  { background: var(--green-bg); color: var(--green); border-color: rgba(74,222,128,0.25); }
+      .btn-concluir:hover  { background: rgba(74,222,128,0.2); }
+
+      .btn-cancelar  { background: var(--red-bg); color: var(--red); border-color: rgba(248,113,113,0.25); }
+      .btn-cancelar:hover  { background: rgba(248,113,113,0.2); }
+
+      .btn-reabrir   { background: var(--orange-bg); color: var(--orange); border-color: rgba(251,146,60,0.25); }
+      .btn-reabrir:hover   { background: rgba(251,146,60,0.2); }
+
+      .btn-excluir   { background: rgba(255,255,255,0.04); color: var(--text-3); border-color: var(--border); }
+      .btn-excluir:hover   { background: var(--red-bg); color: var(--red); border-color: rgba(248,113,113,0.25); }
+
+      /* Empty state */
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-3);
+      }
+      .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+      .empty-text { font-size: 0.85rem; font-weight: 500; }
+
+      /* ── FORM (right column) ── */
+      .form-group { margin-bottom: 13px; }
+      .form-group:last-child { margin-bottom: 0; }
+
+      .form-group label {
+        display: block;
+        font-size: 0.73rem;
+        font-weight: 600;
+        color: var(--text-2);
+        margin-bottom: 6px;
+        letter-spacing: 0.05px;
+      }
+
+      .form-group label .req { color: var(--red); }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px 13px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-1);
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      .form-group input::placeholder,
+      .form-group textarea::placeholder { color: var(--text-3); }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: var(--yellow);
+        background: rgba(255,193,7,0.05);
+        box-shadow: 0 0 0 3px rgba(255,193,7,0.12);
+      }
+
+      .form-group select option { background: #1a1e2e; color: var(--text-1); }
+
+      .form-group textarea { resize: vertical; min-height: 70px; }
+
+      .inline-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 13px; }
+
+      .btn-submit {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, var(--yellow), #ff8f00);
+        color: #000;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 4px 20px rgba(255,193,7,0.35);
+        letter-spacing: 0.1px;
+      }
+      .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 26px rgba(255,193,7,0.48); }
+      .btn-submit:active { transform: scale(0.97); }
+
+      /* ── DRIVERS ── */
+      .driver-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .driver-item:last-child { border-bottom: none; }
+
+      .driver-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(255,193,7,0.1);
+        border: 1px solid var(--border-y);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+
+      .driver-name { font-size: 0.85rem; font-weight: 600; color: var(--text-1); }
+      .driver-phone { font-size: 0.72rem; color: var(--text-3); }
+      .driver-info { flex: 1; min-width: 0; }
+
+      .driver-status {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 8px rgba(74,222,128,0.6);
+        flex-shrink: 0;
+      }
+
+      .driver-del {
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        color: var(--text-3);
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .driver-del:hover { background: var(--red-bg); border-color: rgba(248,113,113,0.25); color: var(--red); }
+
+      .add-driver-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+
+      .add-driver-row input {
+        flex: 1;
+        padding: 9px 12px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.8rem;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-1);
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        min-width: 0;
+      }
+      .add-driver-row input::placeholder { color: var(--text-3); }
+      .add-driver-row input:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(255,193,7,0.12); }
+
+      .btn-add-driver {
+        padding: 0 16px;
+        background: var(--yellow-dim);
+        border: 1px solid var(--border-y);
+        border-radius: var(--radius-sm);
+        color: var(--yellow);
+        font-size: 1.3rem;
+        font-weight: 700;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-add-driver:hover { background: rgba(255,193,7,0.2); }
+
+      /* ══════════════════════════════════
+         MODAL DESPACHO
+      ══════════════════════════════════ */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 500;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s;
+        padding: 20px;
+      }
+
+      .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+      .modal {
+        background: #111520;
+        border: 1px solid rgba(255,193,7,0.2);
+        border-radius: 22px;
+        width: 100%;
+        max-width: 480px;
+        max-height: 90vh;
+        overflow-y: auto;
+        transform: scale(0.92) translateY(16px);
+        transition: transform 0.3s cubic-bezier(0.34,1.3,0.64,1);
+        box-shadow: 0 0 0 1px rgba(255,193,7,0.06), 0 24px 80px rgba(0,0,0,0.8);
+      }
+
+      .modal-overlay.show .modal { transform: scale(1) translateY(0); }
+
+      .modal-head {
+        padding: 22px 22px 0;
+        text-align: center;
+      }
+
+      .modal-head-icon { font-size: 2.5rem; line-height: 1; margin-bottom: 10px; }
+      .modal-head-title { font-size: 1.18rem; font-weight: 800; color: var(--text-1); }
+      .modal-head-sub { font-size: 0.78rem; color: var(--text-3); margin-top: 4px; }
+
+      .modal-body { padding: 16px 22px; }
+
+      .corrida-resumo {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--yellow);
+        border-radius: 10px;
+        padding: 13px 15px;
+        margin-bottom: 16px;
+        font-size: 0.82rem;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .resumo-row { display: flex; align-items: flex-start; gap: 8px; color: var(--text-2); }
+      .resumo-icon { flex-shrink: 0; }
+
+      .driver-select-list { display: flex; flex-direction: column; gap: 8px; }
+
+      .driver-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        background: rgba(255,255,255,0.03);
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .driver-option:hover { background: var(--bg-card-h); border-color: rgba(255,255,255,0.12); }
+
+      .driver-option.selected {
+        background: var(--yellow-dim);
+        border-color: var(--border-y);
+      }
+
+      .dopt-name { font-size: 0.88rem; font-weight: 600; color: var(--text-1); }
+      .dopt-phone { font-size: 0.72rem; color: var(--text-3); }
+
+      .dopt-check {
+        margin-left: auto;
+        opacity: 0;
+        font-size: 1rem;
+        transition: opacity 0.15s;
+        flex-shrink: 0;
+      }
+      .driver-option.selected .dopt-check { opacity: 1; }
+
+      .modal-footer {
+        padding: 8px 22px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .btn-dispatch-confirm {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #25d366, #1db954);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 4px 20px rgba(37,211,102,0.35);
+      }
+      .btn-dispatch-confirm:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 26px rgba(37,211,102,0.5); }
+      .btn-dispatch-confirm:disabled { opacity: 0.38; cursor: not-allowed; }
+
+      .btn-modal-cancel {
+        width: 100%;
+        padding: 12px;
+        background: transparent;
+        color: var(--text-3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .btn-modal-cancel:hover { background: rgba(255,255,255,0.05); color: var(--text-2); }
+
+      /* ══════════════════════════════════
+         TOAST
+      ══════════════════════════════════ */
+      .toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(16px);
+        background: rgba(15,20,35,0.96);
+        color: var(--text-1);
+        padding: 12px 22px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s, transform 0.22s;
+        white-space: nowrap;
+        z-index: 9999;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        max-width: 90vw;
+        text-align: center;
+        border: 1px solid var(--border-y);
+        backdrop-filter: blur(14px);
+      }
+      .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+      /* ══════════════════════════════════
+         RESPONSIVE
+      ══════════════════════════════════ */
+      @media (max-width: 1024px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .main-grid  { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 600px) {
+        .layout { padding: 16px 12px 32px; }
+        .header { padding: 0 14px; height: 56px; }
+        .btn-header span { display: none; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .stat-value { font-size: 1.6rem; }
+        .tabs { flex-wrap: wrap; gap: 3px; }
+        .add-driver-row input:last-of-type { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- ═══════════════════════════════════
+         TELA DE LOGIN (PIN)
+    ════════════════════════════════════ -->
+    <div id="tela-login">
+      <div class="login-box">
+        <div class="login-icon">🔐</div>
+        <div class="login-title">Central de Despacho</div>
+        <div class="login-sub">Digite o PIN de acesso</div>
+
+        <div class="pin-dots" id="pin-dots">
+          <div class="pin-dot" id="dot-0"></div>
+          <div class="pin-dot" id="dot-1"></div>
+          <div class="pin-dot" id="dot-2"></div>
+          <div class="pin-dot" id="dot-3"></div>
+        </div>
+
+        <div class="pin-keypad">
+          <button class="pin-key" onclick="pinDigit('1')">1</button>
+          <button class="pin-key" onclick="pinDigit('2')">2</button>
+          <button class="pin-key" onclick="pinDigit('3')">3</button>
+          <button class="pin-key" onclick="pinDigit('4')">4</button>
+          <button class="pin-key" onclick="pinDigit('5')">5</button>
+          <button class="pin-key" onclick="pinDigit('6')">6</button>
+          <button class="pin-key" onclick="pinDigit('7')">7</button>
+          <button class="pin-key" onclick="pinDigit('8')">8</button>
+          <button class="pin-key" onclick="pinDigit('9')">9</button>
+          <button class="pin-key del zero" onclick="pinDel()">⌫</button>
+        </div>
+
+        <div class="login-hint">PIN padrão: 1234 · Altere em Configurações</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         HEADER
+    ════════════════════════════════════ -->
+    <div class="header">
+      <div class="header-brand">
+        <div class="brand-icon">🗂️</div>
+        <div>
+          <div class="brand-name">Central de Despacho</div>
+          <div class="brand-sub">Táxi Rápido · Painel Operador</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-header btn-cliente" onclick="window.open('/', '_blank')">
+          🚖 <span>Site do cliente</span>
+        </button>
+        <button class="btn-header btn-sair" onclick="sair()">
+          🔒 <span>Sair</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         LAYOUT PRINCIPAL
+    ════════════════════════════════════ -->
+    <div class="layout">
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card total">
+          <div class="stat-icon">🚖</div>
+          <div class="stat-label">Corridas hoje</div>
+          <div class="stat-value" id="stat-total">0</div>
+        </div>
+        <div class="stat-card wait">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-label">Aguardando</div>
+          <div class="stat-value" id="stat-wait">0</div>
+        </div>
+        <div class="stat-card sent">
+          <div class="stat-icon">📡</div>
+          <div class="stat-label">Despachadas</div>
+          <div class="stat-value" id="stat-sent">0</div>
+        </div>
+        <div class="stat-card done">
+          <div class="stat-icon">✅</div>
+          <div class="stat-label">Concluídas</div>
+          <div class="stat-value" id="stat-done">0</div>
+        </div>
+      </div>
+
+      <!-- Grid principal -->
+      <div class="main-grid">
+
+        <!-- ── COLUNA ESQUERDA: Fila de corridas ── -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 Fila de Corridas</div>
+              <div class="tabs" id="tab-group">
+                <button class="tab active" data-filter="todas"    onclick="setFiltro('todas')">Todas <span class="tab-count" id="cnt-todas">0</span></button>
+                <button class="tab"        data-filter="aguardando" onclick="setFiltro('aguardando')">⏳ Aguard. <span class="tab-count" id="cnt-aguardando">0</span></button>
+                <button class="tab"        data-filter="despachada"  onclick="setFiltro('despachada')">📡 Desp. <span class="tab-count" id="cnt-despachada">0</span></button>
+                <button class="tab"        data-filter="concluida"   onclick="setFiltro('concluida')">✅ Conc. <span class="tab-count" id="cnt-concluida">0</span></button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="lista-corridas"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── COLUNA DIREITA: Formulários ── -->
+        <div>
+
+          <!-- Nova corrida -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+              <div class="card-title">➕ Nova corrida</div>
+            </div>
+            <div class="card-body">
+              <div class="inline-row">
+                <div class="form-group">
+                  <label for="f-nome">Nome <span class="req">*</span></label>
+                  <input type="text" id="f-nome" placeholder="Cliente" />
+                </div>
+                <div class="form-group">
+                  <label for="f-fone">Telefone <span class="req">*</span></label>
+                  <input type="tel" id="f-fone" placeholder="(19) 9..." inputmode="tel" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="f-origem">Saída <span class="req">*</span></label>
+                <input type="text" id="f-origem" placeholder="Endereço de origem" />
+              </div>
+              <div class="form-group">
+                <label for="f-destino">Destino <span class="req">*</span></label>
+                <input type="text" id="f-destino" placeholder="Endereço de destino" />
+              </div>
+              <div class="inline-row">
+                <div class="form-group">
+                  <label for="f-horario">Horário</label>
+                  <select id="f-horario">
+                    <option value="agora">⚡ Agora</option>
+                    <option value="agendado">📅 Agendado</option>
+                  </select>
+                </div>
+                <div class="form-group" id="f-dt-wrap" style="display:none">
+                  <label for="f-dt">Data/Hora</label>
+                  <input type="datetime-local" id="f-dt" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="f-obs">Observação</label>
+                <textarea id="f-obs" placeholder="Bagagem, criança, etc..."></textarea>
+              </div>
+              <button class="btn-submit" onclick="adicionarCorrida()">
+                ➕ Adicionar corrida
+              </button>
+            </div>
+          </div>
+
+          <!-- Motoristas -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🚗 Motoristas</div>
+              <span style="font-size:0.73rem;color:var(--text-3)" id="driver-count"></span>
+            </div>
+            <div class="card-body">
+              <div id="lista-motoristas"></div>
+              <div class="add-driver-row">
+                <input type="text" id="driver-nome" placeholder="Nome do motorista" />
+                <input type="tel"  id="driver-fone" placeholder="(19) 99999-9999" inputmode="tel" />
+                <button class="btn-add-driver" onclick="adicionarMotorista()" title="Adicionar motorista">＋</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         MODAL DESPACHAR
+    ════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-despachar" onclick="fecharModal(event)">
+      <div class="modal">
+        <div class="modal-head">
+          <div class="modal-head-icon">📡</div>
+          <div class="modal-head-title">Despachar corrida</div>
+          <div class="modal-head-sub">Selecione o motorista e envie pelo WhatsApp</div>
+        </div>
+        <div class="modal-body">
+          <div class="corrida-resumo" id="modal-resumo"></div>
+          <div style="font-size:0.78rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Escolha o motorista:</div>
+          <div class="driver-select-list" id="driver-select-list"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-dispatch-confirm" id="btn-dispatch-confirm" onclick="confirmarDespacho()" disabled>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            Enviar para motorista no WhatsApp
+          </button>
+          <button class="btn-modal-cancel" onclick="fecharModalDireto()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ═══════════════════════════════════
+         JAVASCRIPT
+    ════════════════════════════════════ -->
+    <script>
+      // ─── CONSTANTS ──────────────────────────────────
+      const LS_PIN      = 'central_pin';
+      const LS_LOGGED   = 'central_logged';
+      const LS_DRIVERS  = 'central_drivers';
+      const DEFAULT_PIN = '1234';
+      const SELF_PHONE  = '19991675464'; // número da central
+
+      // ─── STATE ──────────────────────────────────────
+      let corridas     = [];
+      let motoristas   = [];
+      let filtroAtual  = 'todas';
+      let corridaDespacho = null;
+      let motoristaSelected = null;
+      let corridaCounter = 0;
+
+      // ─── PIN / LOGIN ─────────────────────────────────
+      let pinBuffer = '';
+
+      function getPin() { return localStorage.getItem(LS_PIN) || DEFAULT_PIN; }
+
+      function pinDigit(d) {
+        if (pinBuffer.length >= 4) return;
+        pinBuffer += d;
+        atualizarDots();
+        if (pinBuffer.length === 4) setTimeout(verificarPin, 120);
+      }
+
+      function pinDel() {
+        pinBuffer = pinBuffer.slice(0, -1);
+        atualizarDots();
+      }
+
+      function atualizarDots(erro = false) {
+        for (let i = 0; i < 4; i++) {
+          const d = document.getElementById(`dot-${i}`);
+          d.classList.remove('filled', 'error');
+          if (i < pinBuffer.length) d.classList.add(erro ? 'error' : 'filled');
+        }
+      }
+
+      function verificarPin() {
+        if (pinBuffer === getPin()) {
+          localStorage.setItem(LS_LOGGED, Date.now());
+          document.getElementById('tela-login').classList.add('hide');
+          init();
+        } else {
+          atualizarDots(true);
+          setTimeout(() => { pinBuffer = ''; atualizarDots(); }, 700);
+        }
+      }
+
+      function verificarSessao() {
+        const t = Number(localStorage.getItem(LS_LOGGED) || 0);
+        const oito_horas = 8 * 60 * 60 * 1000;
+        if (Date.now() - t < oito_horas) {
+          document.getElementById('tela-login').classList.add('hide');
+          init();
+        }
+      }
+
+      function sair() {
+        localStorage.removeItem(LS_LOGGED);
+        location.reload();
+      }
+
+      // ─── STORAGE ────────────────────────────────────
+      function saveDrivers() { localStorage.setItem(LS_DRIVERS, JSON.stringify(motoristas)); }
+
+      function loadDrivers() {
+        try { motoristas = JSON.parse(localStorage.getItem(LS_DRIVERS)) || []; } catch { motoristas = []; }
+      }
+
+      // ─── STORAGE (CORRIDAS) ──────────────────────────
+      const LS_CORRIDAS_KEY = 'central_corridas';
+      const LS_COUNTER_KEY  = 'central_counter';
+
+      function saveCorridas() {
+        localStorage.setItem(LS_CORRIDAS_KEY, JSON.stringify(corridas));
+        localStorage.setItem(LS_COUNTER_KEY,  String(corridaCounter));
+      }
+
+      function loadCorridasFromStorage() {
+        try { corridas = JSON.parse(localStorage.getItem(LS_CORRIDAS_KEY)) || []; } catch { corridas = []; }
+        corridaCounter = corridas.length ? Math.max(...corridas.map(c => c.num || 0)) : 0;
+        try { corridaCounter = Math.max(corridaCounter, parseInt(localStorage.getItem(LS_COUNTER_KEY) || '0')); } catch {}
+      }
+
+      function destacarCard(id) {
+        setTimeout(() => {
+          const card = document.getElementById(`card-${id}`);
+          if (!card) return;
+          card.style.transition = 'box-shadow 0.3s, transform 0.3s';
+          card.style.boxShadow  = '0 0 0 3px #FFC107, 0 4px 20px rgba(255,193,7,0.4)';
+          card.style.transform  = 'scale(1.01)';
+          setTimeout(() => { card.style.boxShadow = ''; card.style.transform = ''; }, 1800);
+        }, 300);
+      }
+
+      // ─── HELPERS ────────────────────────────────────
+      function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+      function vEl(id) { return (document.getElementById(id)?.value || '').trim(); }
+      function hoje() { return new Date().toLocaleDateString('pt-BR'); }
+      function horaAgora() { return new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }); }
+      function formatDt(iso) {
+        if (!iso) return '';
+        return new Date(iso).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      }
+      function corridasHoje() {
+        const d = hoje();
+        return corridas.filter(c => new Date(c.criadoEm).toLocaleDateString('pt-BR') === d);
+      }
+
+      let toastTimer;
+      function toast(msg, dur = 3000) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), dur);
+      }
+
+      // ─── STATS ──────────────────────────────────────
+      function atualizarStats() {
+        const h = corridasHoje();
+        document.getElementById('stat-total').textContent = h.length;
+        document.getElementById('stat-wait').textContent  = h.filter(c=>c.status==='aguardando').length;
+        document.getElementById('stat-sent').textContent  = h.filter(c=>c.status==='despachada').length;
+        document.getElementById('stat-done').textContent  = h.filter(c=>c.status==='concluida').length;
+
+        document.getElementById('cnt-todas').textContent      = corridas.length;
+        document.getElementById('cnt-aguardando').textContent = corridas.filter(c=>c.status==='aguardando').length;
+        document.getElementById('cnt-despachada').textContent  = corridas.filter(c=>c.status==='despachada').length;
+        document.getElementById('cnt-concluida').textContent   = corridas.filter(c=>c.status==='concluida').length;
+      }
+
+      // ─── FILTRO ──────────────────────────────────────
+      function setFiltro(f) {
+        filtroAtual = f;
+        document.querySelectorAll('.tab').forEach(t => {
+          t.classList.toggle('active', t.dataset.filter === f);
+        });
+        renderCorridas();
+      }
+
+      // ─── RENDER CORRIDAS ─────────────────────────────
+      function renderCorridas() {
+        atualizarStats();
+        const container = document.getElementById('lista-corridas');
+        const lista = filtroAtual === 'todas'
+          ? [...corridas].reverse()
+          : [...corridas].filter(c => c.status === filtroAtual).reverse();
+
+        if (!lista.length) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">🚖</div>
+              <div class="empty-text">Nenhuma corrida ${filtroAtual !== 'todas' ? 'com esse status' : 'registrada ainda'}.</div>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = lista.map(c => {
+          const horarioStr = c.horarioTipo === 'agora'
+            ? '⚡ Agora'
+            : c.horarioDt ? `📅 ${formatDt(c.horarioDt)}` : '–';
+
+          const badgeClass = { aguardando:'badge-aguardando', despachada:'badge-despachada', concluida:'badge-concluida', cancelada:'badge-cancelada' }[c.status] || '';
+          const badgeLabel = { aguardando:'⏳ Aguardando', despachada:'📡 Despachada', concluida:'✅ Concluída', cancelada:'❌ Cancelada' }[c.status] || c.status;
+
+          const botoesAction = (() => {
+            if (c.status === 'aguardando') return `
+              <button class="btn-action btn-despachar" onclick="abrirDespacho('${c.id}')">📡 Despachar</button>
+              <button class="btn-action btn-concluir"  onclick="mudarStatus('${c.id}','concluida')">✅ Concluída</button>
+              <button class="btn-action btn-cancelar"  onclick="mudarStatus('${c.id}','cancelada')">✖ Cancelar</button>`;
+            if (c.status === 'despachada') return `
+              <button class="btn-action btn-despachar" onclick="abrirDespacho('${c.id}')">📡 Re-despachar</button>
+              <button class="btn-action btn-concluir"  onclick="mudarStatus('${c.id}','concluida')">✅ Concluída</button>
+              <button class="btn-action btn-cancelar"  onclick="mudarStatus('${c.id}','cancelada')">✖ Cancelar</button>`;
+            if (c.status === 'concluida' || c.status === 'cancelada') return `
+              <button class="btn-action btn-reabrir" onclick="mudarStatus('${c.id}','aguardando')">🔄 Reabrir</button>
+              <button class="btn-action btn-excluir" onclick="excluirCorrida('${c.id}')">🗑 Excluir</button>`;
+            return '';
+          })();
+
+          return `
+            <div class="corrida-card status-${c.status}" id="card-${c.id}">
+              <div class="corrida-top">
+                <div class="corrida-info">
+                  <div class="corrida-header-row">
+                    <span class="corrida-num">#${String(c.num).padStart(3,'0')}</span>
+                    <span class="corrida-nome">${esc(c.nome)}</span>
+                    <span class="status-badge ${badgeClass}">${badgeLabel}</span>
+                  </div>
+                  <div class="corrida-fone">📱 ${esc(c.telefone)}</div>
+                </div>
+              </div>
+
+              <div style="padding:0 14px 10px">
+                <div class="corrida-rota">
+                  <div class="rota-row"><span class="rota-icon">📍</span><span class="rota-text">${esc(c.origem)}</span></div>
+                  <div class="rota-row" style="color:var(--text-3);font-size:0.68rem;padding:1px 0 1px 22px">↓</div>
+                  <div class="rota-row"><span class="rota-icon">🏁</span><span class="rota-text">${esc(c.destino)}</span></div>
+                </div>
+                <div class="corrida-meta">
+                  <span class="meta-item">🕐 ${horarioStr}</span>
+                  <span class="meta-item">📝 ${new Date(c.criadoEm).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} – ${new Date(c.criadoEm).toLocaleDateString('pt-BR')}</span>
+                </div>
+                ${c.motoristaNome ? `<div class="corrida-motorista show">🚗 Motorista: <strong>${esc(c.motoristaNome)}</strong> · ${esc(c.motoristaFone || '')}</div>` : '<div class="corrida-motorista"></div>'}
+                ${c.obs ? `<div class="corrida-obs show">💬 ${esc(c.obs)}</div>` : ''}
+              </div>
+
+              <div class="corrida-actions">${botoesAction}</div>
+            </div>`;
+        }).join('');
+      }
+
+      function esc(s) {
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      // ─── NOVA CORRIDA ────────────────────────────────
+      document.getElementById('f-horario').addEventListener('change', function() {
+        document.getElementById('f-dt-wrap').style.display = this.value === 'agendado' ? 'block' : 'none';
+      });
+
+      // máscara fone
+      ['f-fone','driver-fone'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', function() {
+          let n = this.value.replace(/\D/g,'').slice(0,11);
+          if (!n) { this.value=''; return; }
+          if (n.length<=2) this.value=`(${n}`;
+          else if (n.length<=7) this.value=`(${n.slice(0,2)}) ${n.slice(2)}`;
+          else this.value=`(${n.slice(0,2)}) ${n.slice(2,n.length<=10?6:7)}-${n.slice(n.length<=10?6:7)}`;
+        });
+      });
+
+      function adicionarCorrida() {
+        const nome     = vEl('f-nome');
+        const telefone = vEl('f-fone');
+        const origem   = vEl('f-origem');
+        const destino  = vEl('f-destino');
+        const horTipo  = vEl('f-horario') || 'agora';
+        const horDt    = vEl('f-dt');
+        const obs      = vEl('f-obs');
+
+        if (!nome || !telefone || !origem || !destino) {
+          toast('⚠️ Preencha Nome, Telefone, Saída e Destino!');
+          return;
+        }
+
+        corridaCounter++;
+        const c = {
+          id: uid(), num: corridaCounter,
+          nome, telefone, origem, destino,
+          horarioTipo: horTipo, horarioDt: horTipo === 'agendado' ? horDt : null, obs,
+          status: 'aguardando', motoristaNome: '', motoristaFone: '',
+          criadoEm: new Date().toISOString(),
+        };
+        corridas.push(c);
+        saveCorridas();
+        renderCorridas();
+
+        ['f-nome','f-fone','f-origem','f-destino','f-obs','f-dt'].forEach(id => {
+          const el = document.getElementById(id); if (el) el.value = '';
+        });
+        document.getElementById('f-horario').value = 'agora';
+        document.getElementById('f-dt-wrap').style.display = 'none';
+        toast(`✅ Corrida #${String(c.num).padStart(3,'0')} adicionada!`);
+      }
+
+      // ─── MUDAR STATUS ────────────────────────────────
+      function mudarStatus(id, novoStatus) {
+        const c = corridas.find(x => x.id === id);
+        if (!c) return;
+        c.status = novoStatus;
+        saveCorridas();
+        renderCorridas();
+        const labels = { concluida:'✅ Corrida concluída!', cancelada:'❌ Corrida cancelada.', aguardando:'🔄 Corrida reaberta.' };
+        toast(labels[novoStatus] || 'Status atualizado.');
+      }
+
+      function excluirCorrida(id) {
+        corridas = corridas.filter(c => c.id !== id);
+        saveCorridas();
+        renderCorridas();
+        toast('🗑️ Corrida excluída.');
+      }
+
+      // ─── MOTORISTAS ──────────────────────────────────
+      function renderMotoristas() {
+        const container = document.getElementById('lista-motoristas');
+        document.getElementById('driver-count').textContent = `${motoristas.length} cadastrado${motoristas.length!==1?'s':''}`;
+
+        if (!motoristas.length) {
+          container.innerHTML = `<div style="font-size:0.8rem;color:var(--text-3);text-align:center;padding:12px 0">Nenhum motorista cadastrado ainda.</div>`;
+          return;
+        }
+        container.innerHTML = motoristas.map(m => `
+          <div class="driver-item">
+            <div class="driver-avatar">🚗</div>
+            <div class="driver-info">
+              <div class="driver-name">${esc(m.nome)}</div>
+              <div class="driver-phone">📱 ${esc(m.telefone)}</div>
+            </div>
+            <div class="driver-status" title="Disponível"></div>
+            <button class="driver-del" onclick="removerMotorista('${m.id}')" title="Remover">✕</button>
+          </div>`).join('');
+      }
+
+      function adicionarMotorista() {
+        const nome = vEl('driver-nome');
+        const fone = vEl('driver-fone');
+        if (!nome || !fone) { toast('⚠️ Informe nome e telefone do motorista!'); return; }
+        motoristas.push({ id: uid(), nome, telefone: fone });
+        saveDrivers();
+        renderMotoristas();
+        document.getElementById('driver-nome').value = '';
+        document.getElementById('driver-fone').value = '';
+        toast(`✅ Motorista "${nome}" adicionado!`);
+      }
+
+      function removerMotorista(id) {
+        motoristas = motoristas.filter(m => m.id !== id);
+        saveDrivers();
+        renderMotoristas();
+        toast('🗑️ Motorista removido.');
+      }
+
+      // ─── MODAL DESPACHO ──────────────────────────────
+      function abrirDespacho(corridaId) {
+        corridaDespacho = corridas.find(c => c.id === corridaId);
+        if (!corridaDespacho) return;
+        motoristaSelected = null;
+
+        // Resumo da corrida
+        const horStr = corridaDespacho.horarioTipo === 'agora' ? '⚡ Agora' :
+          corridaDespacho.horarioDt ? `📅 ${formatDt(corridaDespacho.horarioDt)}` : '–';
+
+        document.getElementById('modal-resumo').innerHTML = `
+          <div class="resumo-row"><span class="resumo-icon">👤</span> <strong>${esc(corridaDespacho.nome)}</strong> · ${esc(corridaDespacho.telefone)}</div>
+          <div class="resumo-row"><span class="resumo-icon">📍</span> ${esc(corridaDespacho.origem)}</div>
+          <div class="resumo-row"><span class="resumo-icon">🏁</span> ${esc(corridaDespacho.destino)}</div>
+          <div class="resumo-row"><span class="resumo-icon">🕐</span> ${horStr}</div>
+          ${corridaDespacho.obs ? `<div class="resumo-row"><span class="resumo-icon">💬</span> ${esc(corridaDespacho.obs)}</div>` : ''}`;
+
+        // Lista de motoristas
+        const list = document.getElementById('driver-select-list');
+        if (!motoristas.length) {
+          list.innerHTML = `<div style="font-size:0.82rem;color:var(--text-3);text-align:center;padding:16px">Nenhum motorista cadastrado.</div>`;
+        } else {
+          list.innerHTML = motoristas.map(m => `
+            <div class="driver-option" id="dopt-${m.id}" onclick="selecionarMotorista('${m.id}')">
+              <div class="driver-avatar">🚗</div>
+              <div style="flex:1">
+                <div class="dopt-name">${esc(m.nome)}</div>
+                <div class="dopt-phone">📱 ${esc(m.telefone)}</div>
+              </div>
+              <span class="dopt-check">✅</span>
+            </div>`).join('');
+        }
+
+        document.getElementById('btn-dispatch-confirm').disabled = true;
+        document.getElementById('modal-despachar').classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function selecionarMotorista(id) {
+        motoristaSelected = motoristas.find(m => m.id === id);
+        document.querySelectorAll('.driver-option').forEach(el => el.classList.remove('selected'));
+        document.getElementById(`dopt-${id}`)?.classList.add('selected');
+        document.getElementById('btn-dispatch-confirm').disabled = false;
+      }
+
+      function confirmarDespacho() {
+        if (!corridaDespacho || !motoristaSelected) return;
+
+        const c = corridaDespacho;
+        const m = motoristaSelected;
+        const horStr = c.horarioTipo === 'agora' ? '⚡ Agora' :
+          c.horarioDt ? `📅 ${formatDt(c.horarioDt)}` : '–';
+
+        const msg =
+          `🚖 *Nova Corrida – Táxi Rápido*\n` +
+          `━━━━━━━━━━━━━━━━━━━\n` +
+          `👤 *Cliente:* ${c.nome}\n` +
+          `📱 *Fone:* ${c.telefone}\n` +
+          `━━━━━━━━━━━━━━━━━━━\n` +
+          `📍 *Saída:* ${c.origem}\n` +
+          `🏁 *Destino:* ${c.destino}\n` +
+          `🕐 *Horário:* ${horStr}\n` +
+          (c.obs ? `━━━━━━━━━━━━━━━━━━━\n💬 *Obs:* ${c.obs}\n` : '') +
+          `━━━━━━━━━━━━━━━━━━━\n` +
+          `_Corrida #${String(c.num).padStart(3,'0')} · Central Táxi Rápido_`;
+
+        const foneNumero = m.telefone.replace(/\D/g,'');
+        const url = `https://wa.me/55${foneNumero}?text=${encodeURIComponent(msg)}`;
+
+        // Atualizar corrida e salvar
+        const idx = corridas.findIndex(x => x.id === c.id);
+        if (idx !== -1) {
+          corridas[idx].status = 'despachada';
+          corridas[idx].motoristaNome = m.nome;
+          corridas[idx].motoristaFone = m.telefone;
+        }
+        saveCorridas();
+
+        fecharModalDireto();
+        renderCorridas();
+        setTimeout(() => {
+          window.open(url, '_blank');
+          toast(`📡 Corrida despachada para ${m.nome}!`);
+        }, 250);
+      }
+
+      function fecharModal(e) {
+        if (e.target === document.getElementById('modal-despachar')) fecharModalDireto();
+      }
+      function fecharModalDireto() {
+        document.getElementById('modal-despachar').classList.remove('show');
+        document.body.style.overflow = '';
+        corridaDespacho = null;
+        motoristaSelected = null;
+      }
+
+      // ─── INIT ────────────────────────────────────────
+      function init() {
+        loadDrivers();
+        renderMotoristas();
+        loadCorridasFromStorage();
+        renderCorridas();
+
+        // Detecta corridas novas enviadas pelo cliente em outra aba
+        window.addEventListener('storage', (e) => {
+          if (e.key !== LS_CORRIDAS_KEY) return;
+          const idsAntes = corridas.map(c => c.id);
+          loadCorridasFromStorage();
+          const novas = corridas.filter(c => !idsAntes.includes(c.id));
+          renderCorridas();
+          if (novas.length > 0) {
+            novas.forEach(c => {
+              toast(`🔔 Nova corrida de ${c.nome} chegou!`, 5000);
+              destacarCard(c.id);
+            });
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.filter === 'aguardando'));
+            filtroAtual = 'aguardando';
+            renderCorridas();
+            setTimeout(() => {
+              document.getElementById(`card-${novas[0].id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 400);
+          }
+        });
+      }
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') fecharModalDireto();
+      });
+
+      verificarSessao();
+    </script>
+  </body>
+</html>

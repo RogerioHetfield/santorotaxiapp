@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Táxi WhatsApp"
+version = "1.0.0"
+id = "artifacts/taxi-whatsapp"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18652
+
+[services.development]
+run = "pnpm --filter @workspace/taxi-whatsapp run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/taxi-whatsapp", "run", "build" ]
+publicDir = "artifacts/taxi-whatsapp/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18652"
+BASE_PATH = "/"

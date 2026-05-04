@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Táxi Rápido – Peça seu táxi pelo WhatsApp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --yellow: #FFC107;
+        --yellow-dark: #e5a800;
+        --yellow-glow: rgba(255,193,7,0.45);
+        --green: #25d366;
+        --green-dark: #1db954;
+        --blue: #1976d2;
+        --red: #e53935;
+        --white: #ffffff;
+        --black: #111111;
+        --gray-50: #fafafa;
+        --gray-100: #f4f4f4;
+        --gray-200: #e8e8e8;
+        --gray-300: #d0d0d0;
+        --gray-500: #9e9e9e;
+        --gray-600: #757575;
+        --gray-700: #555;
+        --gray-800: #333;
+        --radius: 20px;
+        --radius-sm: 13px;
+        --shadow-card: 0 8px 40px rgba(0,0,0,0.22);
+        --shadow-btn: 0 6px 28px rgba(37,211,102,0.5);
+        --shadow-yellow: 0 6px 28px rgba(255,193,7,0.45);
+      }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+        color: var(--black);
+        padding-bottom: 110px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* ── Taxi photo background ── */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1920&q=80');
+        background-size: cover;
+        background-position: center;
+        z-index: -2;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(
+          160deg,
+          rgba(5,5,5,0.88) 0%,
+          rgba(20,14,0,0.82) 40%,
+          rgba(0,0,0,0.87) 100%
+        );
+        z-index: -1;
+      }
+
+      /* ══════════════════════════════════
+         HEADER
+      ══════════════════════════════════ */
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 200;
+        background: rgba(0,0,0,0.72);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border-bottom: 1px solid rgba(255,193,7,0.18);
+        box-shadow: 0 2px 30px rgba(0,0,0,0.45);
+        padding: 0 16px;
+      }
+
+      .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 0 9px;
+        gap: 10px;
+      }
+
+      .header-brand { display: flex; align-items: center; gap: 11px; }
+
+      .brand-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #FFC107 0%, #ff8f00 100%);
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.45rem;
+        flex-shrink: 0;
+        box-shadow: 0 3px 18px rgba(255,193,7,0.55);
+      }
+
+      .brand-name {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--yellow);
+        letter-spacing: -0.3px;
+        line-height: 1.15;
+        text-shadow: 0 2px 14px rgba(255,193,7,0.35);
+      }
+
+      .brand-tagline {
+        font-size: 0.67rem;
+        color: rgba(255,255,255,0.45);
+        font-weight: 500;
+        margin-top: 1px;
+      }
+
+      .header-trust { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+
+      .trust-badge {
+        background: linear-gradient(135deg, rgba(255,193,7,0.22), rgba(255,140,0,0.15));
+        border: 1px solid rgba(255,193,7,0.38);
+        border-radius: 20px;
+        padding: 4px 11px;
+        font-size: 0.67rem;
+        font-weight: 700;
+        color: var(--yellow);
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+      }
+
+      .trust-sub {
+        font-size: 0.59rem;
+        color: rgba(255,255,255,0.28);
+      }
+
+      .quick-bar {
+        padding: 9px 0 13px;
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn-quick {
+        flex: 1;
+        padding: 13px 12px;
+        background: linear-gradient(135deg, #FFC107, #ff8f00);
+        color: #000;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.87rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        box-shadow: var(--shadow-yellow);
+        transition: transform 0.12s, box-shadow 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        letter-spacing: 0.05px;
+      }
+
+      .btn-quick:hover { transform: translateY(-2px); box-shadow: 0 8px 34px rgba(255,193,7,0.6); }
+      .btn-quick:active { transform: scale(0.96); }
+      .btn-quick-icon { font-size: 1.1rem; }
+
+      /* ══════════════════════════════════
+         CONTAINER
+      ══════════════════════════════════ */
+      .container {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 18px 14px 24px;
+      }
+
+      /* ── Trust strip ── */
+      .trust-strip {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: var(--radius);
+        padding: 12px 14px;
+        margin-bottom: 15px;
+        animation: fadeUp 0.45s ease both;
+      }
+
+      .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.82);
+      }
+
+      .trust-item .ti { font-size: 0.95rem; }
+      .trust-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.18); flex-shrink: 0; }
+
+      /* ══════════════════════════════════
+         CARD (glassmorphism)
+      ══════════════════════════════════ */
+      .card {
+        background: rgba(255,255,255,0.93);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        padding: 22px 20px;
+        margin-bottom: 14px;
+        animation: fadeUp 0.45s ease both;
+      }
+
+      .card:nth-child(2) { animation-delay: 0.08s; }
+      .card:nth-child(3) { animation-delay: 0.16s; }
+      .card:nth-child(4) { animation-delay: 0.22s; }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .card-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--gray-600);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-title::after {
+        content: '';
+        flex: 1;
+        height: 1.5px;
+        background: linear-gradient(to right, var(--gray-200), transparent);
+        border-radius: 2px;
+      }
+
+      /* ══════════════════════════════════
+         FORM FIELDS
+      ══════════════════════════════════ */
+      .field { margin-bottom: 16px; }
+      .field:last-child { margin-bottom: 0; }
+
+      label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 7px;
+        letter-spacing: 0.05px;
+      }
+
+      label span.req { color: var(--red); margin-left: 2px; }
+
+      input, textarea, select {
+        width: 100%;
+        padding: 13px 16px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.92rem;
+        border: 2px solid rgba(0,0,0,0.07);
+        border-radius: var(--radius-sm);
+        outline: none;
+        background: rgba(255,255,255,0.75);
+        color: var(--black);
+        transition: border-color 0.18s, box-shadow 0.18s, background 0.15s;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      input:focus, textarea:focus, select:focus {
+        border-color: var(--yellow);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(255,193,7,0.18);
+      }
+
+      input.error, textarea.error {
+        border-color: var(--red);
+        box-shadow: 0 0 0 4px rgba(229,57,53,0.12);
+      }
+
+      textarea { resize: vertical; min-height: 80px; }
+
+      .error-msg {
+        font-size: 0.72rem;
+        color: var(--red);
+        margin-top: 5px;
+        font-weight: 500;
+        display: none;
+      }
+      .error-msg.show { display: block; }
+
+      .input-group { position: relative; display: flex; gap: 8px; }
+      .input-group input { flex: 1; }
+
+      .btn-geo {
+        padding: 0 13px;
+        background: linear-gradient(135deg, rgba(25,118,210,0.1), rgba(25,118,210,0.06));
+        color: var(--blue);
+        border: 2px solid rgba(25,118,210,0.18);
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.65rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        white-space: nowrap;
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        min-width: 62px;
+        line-height: 1.25;
+        flex-shrink: 0;
+        text-align: center;
+      }
+
+      .btn-geo:hover { background: rgba(25,118,210,0.16); transform: translateY(-1px); }
+      .btn-geo:active { transform: scale(0.96); }
+      .btn-geo .geo-icon { font-size: 1.15rem; }
+      .btn-geo.loading { opacity: 0.55; pointer-events: none; }
+
+      /* Quick address chips */
+      .quick-addresses {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+        margin-top: 9px;
+      }
+
+      .addr-chip {
+        padding: 6px 13px;
+        border: 1.5px solid rgba(0,0,0,0.09);
+        border-radius: 30px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        cursor: pointer;
+        background: rgba(255,255,255,0.65);
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        backdrop-filter: blur(6px);
+      }
+
+      .addr-chip:hover {
+        border-color: var(--yellow);
+        background: rgba(255,193,7,0.1);
+        color: #7a5c00;
+        transform: translateY(-1px);
+      }
+
+      .addr-chip:active { transform: scale(0.95); }
+      .addr-chip.saved { border-color: #c8a000; background: rgba(255,193,7,0.12); color: #7a5c00; }
+
+      .add-addr-row { margin-top: 8px; display: none; }
+      .add-addr-row.show { display: flex; gap: 8px; }
+      .add-addr-row input { font-size: 0.82rem; padding: 8px 12px; }
+
+      .btn-save-addr {
+        padding: 0 14px;
+        background: var(--yellow);
+        border: none;
+        border-radius: var(--radius-sm);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        color: #000;
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+      .btn-save-addr:hover { background: var(--yellow-dark); }
+
+      /* Time toggle */
+      .time-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+      .time-opt {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 15px 10px;
+        border: 2px solid rgba(0,0,0,0.07);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        background: rgba(255,255,255,0.55);
+        transition: all 0.15s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .time-opt:active { transform: scale(0.97); }
+
+      .time-opt.active {
+        border-color: var(--yellow);
+        background: rgba(255,193,7,0.12);
+        box-shadow: 0 0 0 4px rgba(255,193,7,0.14);
+      }
+
+      .time-opt .opt-icon { font-size: 1.6rem; }
+      .time-opt .opt-label { font-size: 0.8rem; font-weight: 700; color: var(--gray-700); }
+      .time-opt.active .opt-label { color: #7a5c00; }
+
+      .scheduled-input { margin-top: 10px; display: none; }
+      .scheduled-input.show { display: block; }
+
+      /* ══════════════════════════════════
+         MAIN WHATSAPP BUTTON
+      ══════════════════════════════════ */
+      .btn-whatsapp {
+        width: 100%;
+        padding: 18px 20px;
+        background: linear-gradient(135deg, #25d366 0%, #1db954 100%);
+        color: var(--white);
+        border: none;
+        border-radius: var(--radius);
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: var(--shadow-btn);
+        transition: transform 0.18s, box-shadow 0.18s;
+        -webkit-tap-highlight-color: transparent;
+        letter-spacing: 0.15px;
+        animation: fadeUp 0.5s ease 0.28s both;
+      }
+
+      .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 10px 38px rgba(37,211,102,0.62); }
+      .btn-whatsapp:active { transform: scale(0.97); }
+      .btn-whatsapp.loading { opacity: 0.68; pointer-events: none; }
+      .btn-whatsapp svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+      .btn-clear {
+        width: 100%;
+        padding: 13px;
+        background: rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.65);
+        border: 1.5px solid rgba(255,255,255,0.22);
+        border-radius: var(--radius);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        margin-top: 10px;
+        backdrop-filter: blur(10px);
+        animation: fadeUp 0.5s ease 0.35s both;
+      }
+
+      .btn-clear:hover { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.88); }
+      .btn-clear:active { transform: scale(0.97); }
+
+      /* ══════════════════════════════════
+         FLOATING ACTION BUTTON
+      ══════════════════════════════════ */
+      .fab {
+        position: fixed;
+        bottom: 22px;
+        right: 16px;
+        z-index: 300;
+        background: linear-gradient(135deg, #25d366 0%, #1db954 100%);
+        color: var(--white);
+        border: none;
+        border-radius: 30px;
+        padding: 15px 22px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: var(--shadow-btn);
+        transition: transform 0.18s, box-shadow 0.18s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .fab:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(37,211,102,0.65); }
+      .fab:active { transform: scale(0.95); }
+      .fab svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+      .fab-pulse {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 15px;
+        height: 15px;
+        background: var(--yellow);
+        border-radius: 50%;
+        border: 2.5px solid #000;
+        animation: pulse 1.8s infinite;
+      }
+
+      @keyframes pulse {
+        0%,100% { transform: scale(1); opacity: 1; }
+        50%      { transform: scale(1.45); opacity: 0.65; }
+      }
+
+      /* ══════════════════════════════════
+         MODAL
+      ══════════════════════════════════ */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.72);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s;
+      }
+
+      .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+      .modal {
+        background: #fff;
+        border-radius: 26px 26px 0 0;
+        width: 100%;
+        max-width: 520px;
+        transform: translateY(50px);
+        transition: transform 0.32s cubic-bezier(0.34,1.35,0.64,1);
+        box-shadow: 0 -10px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+      }
+
+      .modal-overlay.show .modal { transform: translateY(0); }
+      .modal-handle { width: 40px; height: 4px; background: #e0e0e0; border-radius: 2px; margin: 14px auto 0; }
+
+      .modal-header { padding: 16px 20px 0; text-align: center; }
+      .modal-emoji { font-size: 3.2rem; line-height: 1; margin-bottom: 10px; }
+      .modal-title { font-size: 1.25rem; font-weight: 800; color: var(--black); }
+      .modal-sub { font-size: 0.82rem; color: var(--gray-600); margin-top: 4px; }
+
+      .modal-preview-wrap {
+        margin: 14px 16px;
+        background: #f0faf4;
+        border-radius: 14px;
+        border-left: 4px solid var(--green);
+        padding: 14px 16px;
+        font-size: 0.82rem;
+        line-height: 1.75;
+        color: var(--gray-800);
+        white-space: pre-wrap;
+        font-family: monospace;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .modal-footer { padding: 0 16px 28px; display: flex; flex-direction: column; gap: 10px; }
+
+      .btn-confirmar {
+        width: 100%;
+        padding: 17px;
+        background: linear-gradient(135deg, #25d366, #1db954);
+        color: var(--white);
+        border: none;
+        border-radius: var(--radius);
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 22px rgba(37,211,102,0.45);
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .btn-confirmar:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(37,211,102,0.58); }
+      .btn-confirmar:active { transform: scale(0.97); }
+      .btn-confirmar svg { width: 20px; height: 20px; }
+
+      .btn-editar {
+        width: 100%;
+        padding: 15px;
+        background: transparent;
+        color: var(--gray-700);
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.92rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .btn-editar:hover { background: var(--gray-100); border-color: #ccc; }
+      .btn-editar:active { transform: scale(0.97); }
+
+      /* ══════════════════════════════════
+         TOAST
+      ══════════════════════════════════ */
+      .toast {
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%) translateY(18px);
+        background: rgba(10,10,10,0.94);
+        color: var(--white);
+        padding: 12px 22px;
+        border-radius: 30px;
+        font-size: 0.84rem;
+        font-weight: 600;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s, transform 0.22s;
+        white-space: nowrap;
+        z-index: 9999;
+        box-shadow: 0 4px 28px rgba(0,0,0,0.3);
+        max-width: 90vw;
+        text-align: center;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+
+      .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+      /* ══════════════════════════════════
+         RESPONSIVE
+      ══════════════════════════════════ */
+      @media (max-width: 380px) {
+        .brand-name { font-size: 1.05rem; }
+        .card { padding: 18px 14px; }
+        input, textarea { font-size: 0.88rem; }
+        .btn-quick { font-size: 0.8rem; }
+        .btn-whatsapp { font-size: 0.98rem; }
+      }
+
+      @media (min-width: 521px) {
+        .fab { right: calc(50% - 260px + 16px); }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- ═══════════════════════════════════════════
+         HEADER
+    ════════════════════════════════════════════ -->
+    <div class="header">
+      <div class="header-top">
+        <div class="header-brand">
+          <div class="brand-icon">🚖</div>
+          <div>
+            <div class="brand-name">Táxi Rápido</div>
+            <div class="brand-tagline">Atendimento pelo WhatsApp · 24h</div>
+          </div>
+        </div>
+        <div class="header-trust">
+          <div class="trust-badge">✅ Atendimento 24h</div>
+          <div class="trust-sub">Resposta em minutos</div>
+        </div>
+      </div>
+
+      <!-- Botão de ação rápida -->
+      <div class="quick-bar">
+        <button class="btn-quick" onclick="chamarAgora()">
+          <span class="btn-quick-icon">🚖</span>
+          Chamar táxi agora
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         CONTAINER
+    ════════════════════════════════════════════ -->
+    <div class="container">
+
+      <!-- Trust strip -->
+      <div class="trust-strip">
+        <div class="trust-item"><span class="ti">⚡</span> Rápido</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="ti">🔒</span> Seguro</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="ti">💬</span> WhatsApp</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="ti">🕐</span> 24 horas</div>
+      </div>
+
+      <!-- Dados pessoais -->
+      <div class="card">
+        <div class="card-title">👤 Seus dados</div>
+
+        <div class="field">
+          <label for="nome">Nome completo <span class="req">*</span></label>
+          <input type="text" id="nome" placeholder="Ex: João Silva" autocomplete="name" />
+          <div class="error-msg" id="err-nome">Por favor, informe seu nome.</div>
+        </div>
+
+        <div class="field">
+          <label for="telefone">Telefone <span class="req">*</span></label>
+          <input type="tel" id="telefone" placeholder="(19) 99999-9999" autocomplete="tel" inputmode="tel" />
+          <div class="error-msg" id="err-telefone">Por favor, informe seu telefone.</div>
+        </div>
+      </div>
+
+      <!-- Detalhes da corrida -->
+      <div class="card">
+        <div class="card-title">📍 Detalhes da corrida</div>
+
+        <!-- Origem -->
+        <div class="field">
+          <label for="origem">Endereço de origem <span class="req">*</span></label>
+          <div class="input-group">
+            <input type="text" id="origem" placeholder="Rua, número, bairro" autocomplete="off" />
+            <button class="btn-geo" id="btn-geo" onclick="usarLocalizacao()" title="Usar minha localização">
+              <span class="geo-icon">📍</span>
+              <span>Minha<br>localização</span>
+            </button>
+          </div>
+
+          <!-- Sugestões salvas -->
+          <div class="quick-addresses" id="chips-origem">
+            <div class="addr-chip" id="chip-casa" onclick="usarEndereco('origem','casa')">
+              🏠 Casa
+            </div>
+            <div class="addr-chip" id="chip-trabalho" onclick="usarEndereco('origem','trabalho')">
+              💼 Trabalho
+            </div>
+            <div class="addr-chip" onclick="usarEndereco('origem','centro')">
+              🏙️ Centro
+            </div>
+            <div class="addr-chip" onclick="toggleSalvar('origem')">
+              ＋ Salvar
+            </div>
+          </div>
+          <div class="add-addr-row" id="salvar-origem-row">
+            <input type="text" id="salvar-origem-nome" placeholder="Nome (ex: Casa, Trabalho...)" />
+            <button class="btn-save-addr" onclick="salvarEndereco('origem')">Salvar</button>
+          </div>
+
+          <div class="error-msg" id="err-origem">Por favor, informe o endereço de origem.</div>
+        </div>
+
+        <!-- Destino -->
+        <div class="field">
+          <label for="destino">Endereço de destino <span class="req">*</span></label>
+          <input type="text" id="destino" placeholder="Rua, número, bairro" autocomplete="off" />
+
+          <div class="quick-addresses" id="chips-destino">
+            <div class="addr-chip" onclick="usarEndereco('destino','casa')">🏠 Casa</div>
+            <div class="addr-chip" onclick="usarEndereco('destino','trabalho')">💼 Trabalho</div>
+            <div class="addr-chip" onclick="usarEndereco('destino','centro')">🏙️ Centro</div>
+            <div class="addr-chip" onclick="toggleSalvar('destino')">＋ Salvar</div>
+          </div>
+          <div class="add-addr-row" id="salvar-destino-row">
+            <input type="text" id="salvar-destino-nome" placeholder="Nome (ex: Casa, Trabalho...)" />
+            <button class="btn-save-addr" onclick="salvarEndereco('destino')">Salvar</button>
+          </div>
+
+          <div class="error-msg" id="err-destino">Por favor, informe o endereço de destino.</div>
+        </div>
+
+        <!-- Horário -->
+        <div class="field">
+          <label>Horário <span class="req">*</span></label>
+          <div class="time-toggle">
+            <div class="time-opt active" id="opt-agora" onclick="setTipo('agora')">
+              <span class="opt-icon">⚡</span>
+              <span class="opt-label">Agora</span>
+            </div>
+            <div class="time-opt" id="opt-agendado" onclick="setTipo('agendado')">
+              <span class="opt-icon">📅</span>
+              <span class="opt-label">Agendado</span>
+            </div>
+          </div>
+          <div class="scheduled-input" id="scheduled-input">
+            <input type="datetime-local" id="horario-agendado" />
+            <div class="error-msg" id="err-horario">Por favor, selecione o horário.</div>
+          </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="field">
+          <label for="obs">Observações</label>
+          <textarea id="obs" placeholder="Ex: Preciso de carro grande, tenho bagagem, criança, etc..."></textarea>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <button class="btn-whatsapp" id="btn-enviar" onclick="handleEnviar()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Confirmar pedido pelo WhatsApp
+      </button>
+
+      <button class="btn-clear" onclick="limparFormulario()">🗑️ Limpar formulário</button>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         BOTÃO FLUTUANTE
+    ════════════════════════════════════════════ -->
+    <button class="fab" onclick="handleEnviar()" title="Chamar táxi agora">
+      <div class="fab-pulse"></div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Chamar agora
+    </button>
+
+    <!-- ═══════════════════════════════════════════
+         MODAL DE CONFIRMAÇÃO
+    ════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)">
+      <div class="modal">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <div class="modal-emoji">🚖</div>
+          <div class="modal-title">Tudo certo! Confirmar pedido?</div>
+          <div class="modal-sub">Veja os dados abaixo antes de enviar para o taxista:</div>
+        </div>
+        <div class="modal-preview-wrap" id="modal-preview"></div>
+        <div class="modal-footer">
+          <button class="btn-confirmar" onclick="confirmarEnvio()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            ✅ Confirmar e Enviar pelo WhatsApp
+          </button>
+          <button class="btn-editar" onclick="fecharModalDireto()">
+            ✏️ Editar pedido
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ═══════════════════════════════════════════
+         JAVASCRIPT
+    ════════════════════════════════════════════ -->
+    <script>
+      const WHATSAPP_NUMBER = '19991675464';
+      const LS_KEY  = 'taxi_form_v2';
+      const LS_ADDR = 'taxi_addresses_v2';
+
+      let tipoHorario = 'agora';
+      let modoRapido  = false;
+
+      // endereços padrão do Centro (sempre disponível)
+      const CENTRO_ADDR = 'Centro, Americana - SP';
+
+      // ─────────────────────────────────────────────
+      // ENDEREÇOS SALVOS
+      // ─────────────────────────────────────────────
+      function getEnderecos() {
+        try { return JSON.parse(localStorage.getItem(LS_ADDR)) || {}; }
+        catch { return {}; }
+      }
+      function saveEnderecos(obj) {
+        localStorage.setItem(LS_ADDR, JSON.stringify(obj));
+      }
+
+      function usarEndereco(campo, chave) {
+        if (chave === 'centro') {
+          set(campo, CENTRO_ADDR);
+          mostrarToast('🏙️ Centro selecionado!');
+          salvarDados();
+          return;
+        }
+        const addrs = getEnderecos();
+        if (addrs[chave]) {
+          set(campo, addrs[chave]);
+          mostrarToast(`✅ ${chave.charAt(0).toUpperCase() + chave.slice(1)} selecionado!`);
+          salvarDados();
+        } else {
+          mostrarToast(`⚠️ Endereço "${chave}" não salvo ainda. Clique em "＋ Salvar" para cadastrar.`);
+        }
+      }
+
+      function toggleSalvar(campo) {
+        const row = document.getElementById(`salvar-${campo}-row`);
+        row.classList.toggle('show');
+        if (row.classList.contains('show')) {
+          document.getElementById(`salvar-${campo}-nome`).value = v(campo);
+          document.getElementById(`salvar-${campo}-nome`).focus();
+        }
+      }
+
+      function salvarEndereco(campo) {
+        const valor = v(campo);
+        const nome  = document.getElementById(`salvar-${campo}-nome`).value.trim().toLowerCase();
+        if (!valor) { mostrarToast('⚠️ Preencha o endereço primeiro!'); return; }
+        if (!nome)  { mostrarToast('⚠️ Informe um nome para o endereço!'); return; }
+
+        const addrs = getEnderecos();
+        addrs[nome] = valor;
+        saveEnderecos(addrs);
+        document.getElementById(`salvar-${campo}-row`).classList.remove('show');
+        atualizarChips();
+        mostrarToast(`✅ Endereço "${nome}" salvo!`);
+      }
+
+      function atualizarChips() {
+        const addrs = getEnderecos();
+        ['origem','destino'].forEach(campo => {
+          const container = document.getElementById(`chips-${campo}`);
+          // remove chips customizados antigos
+          container.querySelectorAll('.addr-chip.custom').forEach(c => c.remove());
+          // insere novos antes do botão "＋ Salvar"
+          const btnSalvar = container.querySelector('[onclick*="toggleSalvar"]');
+          Object.keys(addrs).forEach(nome => {
+            const exists = container.querySelector(`[data-key="${nome}"]`);
+            if (!exists) {
+              const chip = document.createElement('div');
+              chip.className = 'addr-chip custom saved';
+              chip.dataset.key = nome;
+              chip.textContent = `📌 ${nome.charAt(0).toUpperCase() + nome.slice(1)}`;
+              chip.onclick = () => usarEndereco(campo, nome);
+              container.insertBefore(chip, btnSalvar);
+            }
+          });
+        });
+      }
+
+      // ─────────────────────────────────────────────
+      // GEOLOCALIZAÇÃO
+      // ─────────────────────────────────────────────
+      function usarLocalizacao() {
+        if (!navigator.geolocation) {
+          mostrarToast('⚠️ Geolocalização não disponível neste navegador.');
+          return;
+        }
+        const btn = document.getElementById('btn-geo');
+        btn.classList.add('loading');
+        btn.querySelector('.geo-icon').textContent = '⏳';
+
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const { latitude: lat, longitude: lon } = pos.coords;
+            try {
+              const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=pt-BR`
+              );
+              const data = await res.json();
+              const addr = data.display_name || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+              set('origem', addr);
+              salvarDados();
+              mostrarToast('📍 Localização obtida com sucesso!');
+            } catch {
+              set('origem', `${lat.toFixed(5)}, ${lon.toFixed(5)}`);
+              mostrarToast('📍 Coordenadas obtidas!');
+            } finally {
+              btn.classList.remove('loading');
+              btn.querySelector('.geo-icon').textContent = '📍';
+            }
+          },
+          (err) => {
+            btn.classList.remove('loading');
+            btn.querySelector('.geo-icon').textContent = '📍';
+            const msgs = {
+              1: 'Permissão de localização negada.',
+              2: 'Posição indisponível.',
+              3: 'Tempo esgotado ao obter localização.',
+            };
+            mostrarToast(`⚠️ ${msgs[err.code] || 'Erro ao obter localização.'}`);
+          },
+          { timeout: 10000, enableHighAccuracy: true }
+        );
+      }
+
+      // ─────────────────────────────────────────────
+      // HORÁRIO
+      // ─────────────────────────────────────────────
+      function setTipo(tipo) {
+        tipoHorario = tipo;
+        document.getElementById('opt-agora').classList.toggle('active', tipo === 'agora');
+        document.getElementById('opt-agendado').classList.toggle('active', tipo === 'agendado');
+        const inp = document.getElementById('scheduled-input');
+        inp.classList.toggle('show', tipo === 'agendado');
+        if (tipo === 'agendado') document.getElementById('horario-agendado').focus();
+      }
+
+      // ─────────────────────────────────────────────
+      // LOCALSTORAGE FORM
+      // ─────────────────────────────────────────────
+      function salvarDados() {
+        localStorage.setItem(LS_KEY, JSON.stringify({
+          nome: v('nome'), telefone: v('telefone'),
+          origem: v('origem'), destino: v('destino'),
+          obs: v('obs'), tipo: tipoHorario,
+        }));
+      }
+
+      function carregarDados() {
+        try {
+          const d = JSON.parse(localStorage.getItem(LS_KEY));
+          if (!d) return;
+          set('nome', d.nome || '');
+          set('telefone', d.telefone || '');
+          set('origem', d.origem || '');
+          set('destino', d.destino || '');
+          set('obs', d.obs || '');
+          if (d.tipo) setTipo(d.tipo);
+        } catch {}
+      }
+
+      function limparFormulario() {
+        ['nome','telefone','origem','destino','obs','horario-agendado'].forEach(id => set(id, ''));
+        setTipo('agora');
+        localStorage.removeItem(LS_KEY);
+        limparErros();
+        mostrarToast('🗑️ Formulário limpo!');
+      }
+
+      // ─────────────────────────────────────────────
+      // HELPERS
+      // ─────────────────────────────────────────────
+      function v(id)        { return (document.getElementById(id)?.value || '').trim(); }
+      function set(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
+
+      // Máscara de telefone
+      document.getElementById('telefone').addEventListener('input', function() {
+        let n = this.value.replace(/\D/g,'').slice(0, 11);
+        if (!n.length) { this.value = ''; return; }
+        if (n.length <= 2)  this.value = `(${n}`;
+        else if (n.length <= 7) this.value = `(${n.slice(0,2)}) ${n.slice(2)}`;
+        else this.value = `(${n.slice(0,2)}) ${n.slice(2, n.length<=10 ? 6:7)}-${n.slice(n.length<=10 ? 6:7)}`;
+      });
+
+      // Auto-save
+      ['nome','telefone','origem','destino','obs'].forEach(id =>
+        document.getElementById(id)?.addEventListener('input', salvarDados)
+      );
+
+      // ─────────────────────────────────────────────
+      // VALIDAÇÃO
+      // ─────────────────────────────────────────────
+      function limparErros() {
+        document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+        document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+      }
+      function mostrarErro(fieldId, errId) {
+        document.getElementById(fieldId)?.classList.add('error');
+        document.getElementById(errId)?.classList.add('show');
+      }
+      function validar() {
+        limparErros();
+        let ok = true;
+        if (!v('nome'))     { mostrarErro('nome','err-nome');         ok = false; }
+        if (!v('telefone')) { mostrarErro('telefone','err-telefone'); ok = false; }
+        if (!v('origem'))   { mostrarErro('origem','err-origem');     ok = false; }
+        if (!v('destino'))  { mostrarErro('destino','err-destino');   ok = false; }
+        if (tipoHorario === 'agendado' && !v('horario-agendado')) {
+          mostrarErro('horario-agendado','err-horario'); ok = false;
+        }
+        if (!ok) document.querySelector('.error')?.scrollIntoView({ behavior:'smooth', block:'center' });
+        return ok;
+      }
+
+      // ─────────────────────────────────────────────
+      // MENSAGENS
+      // ─────────────────────────────────────────────
+      function getHorarioStr() {
+        if (tipoHorario === 'agora') return '⚡ Agora';
+        const raw = document.getElementById('horario-agendado').value;
+        if (!raw) return '–';
+        return '📅 ' + new Date(raw).toLocaleString('pt-BR', {
+          day:'2-digit', month:'2-digit', year:'numeric',
+          hour:'2-digit', minute:'2-digit'
+        });
+      }
+
+      function montarMensagem() {
+        const nome     = v('nome');
+        const telefone = v('telefone');
+        const origem   = v('origem');
+        const destino  = v('destino');
+        const obs      = v('obs');
+        const horario  = getHorarioStr();
+
+        let msg = `🚖 *Novo Pedido de Táxi*\n`;
+        msg += `━━━━━━━━━━━━━━━━━━━\n`;
+        msg += `👤 *Nome:* ${nome}\n`;
+        msg += `📱 *Fone:* ${telefone}\n`;
+        msg += `━━━━━━━━━━━━━━━━━━━\n`;
+        msg += `📍 *Saída:* ${origem}\n`;
+        msg += `🏁 *Destino:* ${destino}\n`;
+        msg += `🕐 *Horário:* ${horario}\n`;
+        if (obs) { msg += `━━━━━━━━━━━━━━━━━━━\n`; msg += `💬 *Obs:* ${obs}\n`; }
+        msg += `━━━━━━━━━━━━━━━━━━━`;
+        return msg;
+      }
+
+      function salvarNaFila() {
+        try {
+          const lista = JSON.parse(localStorage.getItem('central_corridas') || '[]');
+          let counter  = parseInt(localStorage.getItem('central_counter')  || '0');
+          counter++;
+          lista.push({
+            id:          Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+            num:         counter,
+            nome:        v('nome'),
+            telefone:    v('telefone'),
+            origem:      v('origem'),
+            destino:     v('destino'),
+            horarioTipo: tipoHorario,
+            horarioDt:   tipoHorario === 'agendado' ? document.getElementById('horario-agendado').value : null,
+            obs:         v('obs'),
+            status:      'aguardando',
+            motoristaNome: '', motoristaFone: '',
+            criadoEm:    new Date().toISOString(),
+          });
+          localStorage.setItem('central_corridas', JSON.stringify(lista));
+          localStorage.setItem('central_counter',  String(counter));
+        } catch (_) {}
+      }
+
+      function montarMensagemRapida() {
+        const nome = v('nome') || 'Cliente';
+        const telefone = v('telefone') || '–';
+        const origem = v('origem') || 'A confirmar';
+        let msg = `🚖 *Chamar Táxi – Pedido Rápido*\n\n`;
+        msg += `👤 ${nome}\n`;
+        msg += `📱 ${telefone}\n`;
+        msg += `📍 Saída: ${origem}\n`;
+        msg += `⚡ Horário: Agora\n\n`;
+        msg += `_Pedido rápido – taxista entrará em contato para confirmar destino._`;
+        return msg;
+      }
+
+      // ─────────────────────────────────────────────
+      // AÇÃO RÁPIDA (sem preencher tudo)
+      // ─────────────────────────────────────────────
+      function chamarAgora() {
+        const msg = montarMensagemRapida();
+        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+        mostrarToast('🚖 Abrindo WhatsApp...');
+        setTimeout(() => window.open(url, '_blank'), 300);
+      }
+
+      // ─────────────────────────────────────────────
+      // FLUXO PRINCIPAL
+      // ─────────────────────────────────────────────
+      function handleEnviar() {
+        modoRapido = false;
+        if (!validar()) return;
+        document.getElementById('modal-preview').textContent = montarMensagem();
+        abrirModal();
+      }
+
+      function confirmarEnvio() {
+        fecharModalDireto();
+        const btn = document.getElementById('btn-enviar');
+        btn.classList.add('loading');
+
+        salvarNaFila();
+
+        const msg = montarMensagem();
+        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+
+        setTimeout(() => {
+          window.open(url, '_blank');
+          btn.classList.remove('loading');
+          mostrarToast('✅ Pedido enviado pelo WhatsApp!');
+        }, 350);
+      }
+
+      // ─────────────────────────────────────────────
+      // MODAL
+      // ─────────────────────────────────────────────
+      function abrirModal() {
+        document.getElementById('modal-overlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal(e) {
+        if (e.target === document.getElementById('modal-overlay')) fecharModalDireto();
+      }
+      function fecharModalDireto() {
+        document.getElementById('modal-overlay').classList.remove('show');
+        document.body.style.overflow = '';
+      }
+
+      // ─────────────────────────────────────────────
+      // TOAST
+      // ─────────────────────────────────────────────
+      let toastTimer;
+      function mostrarToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+      }
+
+      // ─────────────────────────────────────────────
+      // INIT
+      // ─────────────────────────────────────────────
+      carregarDados();
+      atualizarChips();
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') fecharModalDireto();
+      });
+    </script>
+  </body>
+</html>
