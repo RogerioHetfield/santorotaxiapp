@@ -1541,7 +1541,7 @@
           c.horarioDt ? `📅 ${formatDt(c.horarioDt)}` : '–';
 
         const msg =
-          `🚖 *Nova Corrida – Táxi Rápido*\n` +
+          `🚖 *Nova Corrida – Santoro Táxi*\n` +
           `━━━━━━━━━━━━━━━━━━━\n` +
           `👤 *Cliente:* ${c.nome}\n` +
           `📱 *Fone:* ${c.telefone}\n` +
@@ -1551,7 +1551,7 @@
           `🕐 *Horário:* ${horStr}\n` +
           (c.obs ? `━━━━━━━━━━━━━━━━━━━\n💬 *Obs:* ${c.obs}\n` : '') +
           `━━━━━━━━━━━━━━━━━━━\n` +
-          `_Corrida #${String(c.num).padStart(3,'0')} · Central Táxi Rápido_`;
+          `_Corrida #${String(c.num).padStart(3,'0')} · Central Santoro Táxi_`;
 
         const foneNumero = m.telefone.replace(/\D/g,'');
         const url = `https://wa.me/55${foneNumero}?text=${encodeURIComponent(msg)}`;
